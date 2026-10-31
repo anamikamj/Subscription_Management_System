@@ -1,8 +1,6 @@
 
 """SQLModel database entities for Brightloop."""
 
-from __future__ import annotations
-
 from datetime import date, datetime, timezone
 from typing import Optional
 
@@ -191,14 +189,14 @@ class SubscriptionLine(SQLModel, table=True):
 class Invoice(SQLModel, table=True):
     __tablename__ = "invoices"
 
-    # Prevent two invoices for the same subscription
-    # and billing period.
+    # Prevent two invoices for the same subscription, billing period, and revision.
     __table_args__ = (
         UniqueConstraint(
             "subscription_id",
             "billing_period_start",
             "billing_period_end",
-            name="uq_invoice_subscription_billing_period",
+            "revision_number",
+            name="uq_invoice_subscription_billing_period_rev",
         ),
     )
 
@@ -235,6 +233,13 @@ class Invoice(SQLModel, table=True):
         index=True,
     )
 
+    revision_number: int = Field(default=1, index=True)
+    supersedes_invoice_id: Optional[int] = Field(
+        default=None,
+        foreign_key="invoices.id",
+    )
+    revision_reason: Optional[str] = None
+
     subscription: Subscription = Relationship(back_populates="invoices")
     customer: Customer = Relationship(back_populates="invoices")
 
@@ -269,7 +274,11 @@ class InvoiceLine(SQLModel, table=True):
     quantity: int
     unit_price_paise: int
     tax_rate_bps: int = Field(default=0)
-    line_total_paise: int
+    line_subtotal_paise: int = Field(default=0)
+    discount_paise: int = Field(default=0)
+    taxable_amount_paise: int = Field(default=0)
+    tax_amount_paise: int = Field(default=0)
+    line_total_paise: int = Field(default=0)
 
     invoice: Invoice = Relationship(back_populates="lines")
     product: Optional[Product] = Relationship(

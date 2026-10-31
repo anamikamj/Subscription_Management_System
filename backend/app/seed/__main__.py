@@ -1,0 +1,6 @@
+"""Main entry point for `python -m app.seed`."""
+
+from app.seed.seed_data import seed_database
+
+if __name__ == "__main__":
+    seed_database()

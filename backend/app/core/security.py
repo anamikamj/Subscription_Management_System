@@ -4,15 +4,11 @@ from datetime import datetime, timedelta, timezone
 from jose import JWTError, jwt
 from pwdlib import PasswordHash
 
+from app.core.config import settings
 
-SECRET_KEY = os.getenv("SECRET_KEY")
-if not SECRET_KEY:
-    raise RuntimeError(
-        "Set SECRET_KEY in the environment before starting the backend."
-    )
-
+SECRET_KEY = os.getenv("SECRET_KEY", settings.secret_key)
 ALGORITHM = "HS256"
-ACCESS_TOKEN_MINUTES = int(os.getenv("ACCESS_TOKEN_MINUTES", "60"))
+ACCESS_TOKEN_MINUTES = int(os.getenv("ACCESS_TOKEN_MINUTES", str(settings.access_token_minutes)))
 
 password_hasher = PasswordHash.recommended()
 

@@ -7,6 +7,12 @@ class RegisterRequest(BaseModel):
     password: str
 
 
+class StaffCreateRequest(BaseModel):
+    name: str = Field(min_length=1, max_length=150)
+    email: EmailStr
+    password: str
+
+
 class LoginRequest(BaseModel):
     email: EmailStr
     password: str

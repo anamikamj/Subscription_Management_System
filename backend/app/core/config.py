@@ -11,6 +11,7 @@ BACKEND_DIR = Path(__file__).resolve().parents[2]
 
 # Local SQLite database location.
 DATABASE_PATH = BACKEND_DIR / "data" / "brightloop.db"
+DATABASE_PATH.parent.mkdir(parents=True, exist_ok=True)
 
 
 class Settings(BaseSettings):
@@ -25,6 +26,8 @@ class Settings(BaseSettings):
     )
 
     frontend_origin: str = "http://localhost:5173"
+    secret_key: str = "l6fGo7LD0S_BK_0Ivil8aBm8n6pqBYguIesPiHH46EJFTK3EHB9Vj17xVL1JZ7wN"
+    access_token_minutes: int = 60
 
     model_config = SettingsConfigDict(
         env_file=BACKEND_DIR / ".env",

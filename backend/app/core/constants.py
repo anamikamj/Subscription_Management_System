@@ -1,1 +1,0 @@
-"""Shared enums and constants for roles and lifecycle statuses."""\n

@@ -1,0 +1,1 @@
+# Database schema\n\nDocument entities, relationships, constraints, and indexes here.\n

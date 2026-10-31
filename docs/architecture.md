@@ -1,0 +1,1 @@
+# Architecture\n\nDocument the frontend, API, service, and persistence boundaries here.\n

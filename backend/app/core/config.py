@@ -1,0 +1,1 @@
+"""Application configuration. Load environment variables here."""\n

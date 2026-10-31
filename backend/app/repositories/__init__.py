@@ -1,1 +1,1 @@
-"""Database access/query layer."""\n
+"""Database access/query layer."""

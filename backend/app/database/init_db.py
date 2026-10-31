@@ -3,6 +3,9 @@
 
 from sqlmodel import SQLModel
 
+# Import models so SQLModel registers their tables.
+import app.models  # noqa: F401
+
 from app.database.connection import engine
 
 

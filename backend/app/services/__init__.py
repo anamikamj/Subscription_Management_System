@@ -1,1 +1,1 @@
-"""Business logic services."""\n
+"""Business logic services."""

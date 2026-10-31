@@ -1,7 +1,25 @@
-
+import { useState } from "react";
 import "./App.css";
+import { LoginPage } from "./features/auth/pages/LoginPage";
+import type { User } from "./types";
 
 function App() {
+  const [view, setView] = useState<'landing' | 'login'>('landing');
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+
+  if (view === 'login') {
+    return (
+      <LoginPage
+        onSuccess={(user) => {
+          setCurrentUser(user);
+          alert(`Logged in successfully as ${user.name} (${user.role})!`);
+          setView('landing');
+        }}
+        onBackToHome={() => setView('landing')}
+      />
+    );
+  }
+
   return (
     <div className="app">
       <nav className="navbar">
@@ -17,8 +35,8 @@ function App() {
         </div>
 
         <div className="nav-actions">
-          <button className="login-btn">Log in</button>
-          <button className="get-started">Get Started ↗</button>
+          <button className="login-btn" onClick={() => setView('login')}>Log in</button>
+          <button className="get-started" onClick={() => setView('login')}>Get Started ↗</button>
         </div>
       </nav>
 
@@ -41,7 +59,7 @@ function App() {
           </p>
 
           <div className="hero-buttons">
-            <button className="get-started">
+            <button className="get-started" onClick={() => setView('login')}>
               Get Started →
             </button>
             <button className="learn-more">

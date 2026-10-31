@@ -1,0 +1,1 @@
+"""Shared FastAPI dependencies (database session, current user, etc.)."""\n

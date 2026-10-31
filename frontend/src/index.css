@@ -51,15 +51,31 @@
 }
 
 #root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
+  width: 100%;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
+}
+
+@media print {
+  .app-sidebar,
+  .mobile-bar,
+  header,
+  .modal-backdrop,
+  .nav-actions,
+  button {
+    display: none !important;
+  }
+  body, #root {
+    background: #ffffff !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  .printable-invoice {
+    padding: 0 !important;
+    max-width: 100% !important;
+  }
 }
 
 body {

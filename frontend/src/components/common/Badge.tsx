@@ -1,31 +1,36 @@
 import React from 'react';
 
 interface BadgeProps {
-  children: React.ReactNode;
-  variant?: 'primary' | 'success' | 'warning' | 'danger' | 'neutral' | 'purple';
-  size?: 'sm' | 'md';
+  label: string;
+  bg?: string;
+  color?: string;
+  border?: string;
 }
 
-export function Badge({ children, variant = 'neutral', size = 'sm' }: BadgeProps) {
-  const variantStyles = {
-    primary: 'bg-indigo-50 text-indigo-700 border-indigo-200',
-    success: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-    warning: 'bg-amber-50 text-amber-700 border-amber-200',
-    danger: 'bg-rose-50 text-rose-700 border-rose-200',
-    neutral: 'bg-slate-100 text-slate-700 border-slate-200',
-    purple: 'bg-purple-50 text-purple-700 border-purple-200'
-  };
-
-  const sizeStyles = {
-    sm: 'text-[11px] px-2 py-0.5',
-    md: 'text-xs px-2.5 py-1'
-  };
-
+export const Badge: React.FC<BadgeProps> = ({
+  label,
+  bg = '#f1f5f9',
+  color = '#475569',
+  border = 'transparent',
+}) => {
   return (
     <span
-      className={`inline-flex items-center gap-1 font-semibold rounded-full border ${variantStyles[variant]} ${sizeStyles[size]}`}
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        padding: '3px 9px',
+        borderRadius: '9999px',
+        fontSize: '12px',
+        fontWeight: 600,
+        backgroundColor: bg,
+        color: color,
+        border: `1px solid ${border}`,
+        lineHeight: 1.3,
+        letterSpacing: '0.02em',
+      }}
     >
-      {children}
+      {label}
     </span>
   );
-}
+};
+

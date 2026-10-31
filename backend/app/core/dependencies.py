@@ -1,52 +1,64 @@
 from typing import Annotated, Callable
 
 from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlmodel import Session
 
 from app.core.security import decode_access_token
-from app.database import get_session
-from app.models.user import User
+from app.database.session import get_session
+from app.models.entities import User
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
+
+bearer_scheme = HTTPBearer(auto_error=False)
+
+
+def _unauthorized(detail: str = "Invalid or expired access token.") -> HTTPException:
+    return HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail=detail,
+        headers={"WWW-Authenticate": "Bearer"},
+    )
 
 
 def get_current_user(
-    token: Annotated[str, Depends(oauth2_scheme)],
+    credentials: Annotated[
+        HTTPAuthorizationCredentials | None,
+        Depends(bearer_scheme),
+    ],
     session: Annotated[Session, Depends(get_session)],
 ) -> User:
-    payload = decode_access_token(token)
-    if not payload or not payload.get("sub"):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid or expired access token.",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+    if credentials is None or credentials.scheme.lower() != "bearer":
+        raise _unauthorized("Bearer access token required.")
+
+    payload = decode_access_token(credentials.credentials)
+    if not payload:
+        raise _unauthorized()
 
     try:
-        user_id = int(payload["sub"])
+        user_id = int(payload.get("sub"))
     except (TypeError, ValueError):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid access token.",
-        )
+        raise _unauthorized("Invalid access token.")
 
     user = session.get(User, user_id)
-    if user is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User no longer exists.",
-        )
+    if user is None or not user.is_active:
+        raise _unauthorized("User not found or inactive.")
+
     return user
 
 
+def _role_value(user: User) -> str:
+    """Return a normalized role for either a string or enum field."""
+    role = user.role
+    return str(getattr(role, "value", role)).upper()
+
+
 def require_roles(*allowed_roles: str) -> Callable:
-    normalized_roles = {role.upper() for role in allowed_roles}
+    allowed = {role.upper() for role in allowed_roles}
 
     def role_checker(
         current_user: Annotated[User, Depends(get_current_user)],
     ) -> User:
-        if str(current_user.role).upper() not in normalized_roles:
+        if _role_value(current_user) not in allowed:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="You do not have permission to perform this action.",
